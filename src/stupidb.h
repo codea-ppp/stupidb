@@ -1,7 +1,7 @@
 #ifndef _STUPIDB_SRC_STUPIDB_H_
 #define _STUPIDB_SRC_STUPIDB_H_
 
-#include <mysql.h>
+#include <mysql/mysql.h>
 
 #include <string>
 

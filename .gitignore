@@ -34,3 +34,4 @@ build/
 Session.vim
 .ycm_extra_conf.py
 tags
+dbconfig.yaml

@@ -31,3 +31,6 @@
 *.out
 *.app
 build/
+Session.vim
+.ycm_extra_conf.py
+tags

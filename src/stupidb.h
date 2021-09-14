@@ -5,7 +5,7 @@
 
 #include <string>
 
-#include "src/dbdef.h"
+#include "src/dbargs.h"
 
 namespace stupid
 {
@@ -20,9 +20,9 @@ public:
 private:
 	bool _is_open;
 
-	dbargs _args;
+	const dbargs _args;
  
-	MYSQL _handle;
+	MYSQL* _db;
 };
 
 }

@@ -13,6 +13,7 @@ target_include_directories(${PROJECT_NAME} PRIVATE
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
 	mariadb
+	yaml
 	)
 
 add_executable(${PROJECT_NAME}_test 
@@ -26,4 +27,5 @@ target_include_directories(${PROJECT_NAME}_test PRIVATE
 
 target_link_libraries(${PROJECT_NAME}_test PRIVATE
 	mariadb
+	yaml
 	)

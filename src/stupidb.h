@@ -1,28 +1,17 @@
 #ifndef _STUPIDB_SRC_STUPIDB_H_
 #define _STUPIDB_SRC_STUPIDB_H_
 
-#include <mysql/mysql.h>
-
-#include <string>
-
-#include "src/dbargs.h"
-
 namespace stupid
 {
 
+class stupidb_impl;
 class stupidb 
 {
 public:
-	stupidb(const dbargs& args);
-
+	stupidb();
 	~stupidb();
 
 private:
-	bool _is_open;
-
-	const dbargs _args;
- 
-	MYSQL* _db;
 };
 
 }

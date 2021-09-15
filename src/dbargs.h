@@ -1,36 +1,31 @@
 #ifndef _STUPIDB_SRC_DBARGS_H_
 #define _STUPIDB_SRC_DBARGS_H_
 
-#include <string>
-
-#include <mysql/mysql.h>
-#include <json/json.h>
-
 namespace stupid
 {
 
 class dbargs
 {
 public:
-	dbargs(const std::string& config_path); // yaml
+	dbargs(const char* config_path); // json
+	dbargs(const char* host, 
+		   const char* user,
+		   const char* password,
+		   const char* db,
+		   unsigned int port,
+		   const char* sock, 
+		   const int max_connection);
 
-	MYSQL* open() const; // must be freed by mysql_close
+	~dbargs();
 
-	bool is_load() { return _is_load; }
-
-private:
-	bool loading_config_buffer(Json::Value* root, const char* config_path);
-	bool loading_config(Json::Value& root);
-
-private:
-	bool _is_load;
-
-	std::string _host;
-	std::string _user;
-	std::string _password;
-	std::string _db;
+public:
+	char* _host;
+	char* _user;
+	char* _password;
+	char* _db;
 	unsigned int _port;
-	std::string _sock;
+	char* _sock;
+	unsigned int _max_connection;
 };
 
 }

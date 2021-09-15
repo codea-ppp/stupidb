@@ -7,6 +7,8 @@
 #include <mysql/mysql.h>
 #include <json/json.h>
 
+#include "src/zloghub.h"
+
 namespace stupid
 {
 
@@ -16,6 +18,17 @@ static inline void allocate_string(char** notalloc, const char* src)
 	*notalloc = (char*)malloc(len * sizeof(char) + 1);
 	memcpy(*notalloc, src, len);
 	(*notalloc)[len] = '\0';
+}
+
+static inline void string_check_patch(char** ptr, const char* src)
+{
+	if (src)
+		allocate_string(ptr, src);
+	else
+	{
+		zlog_warn(zloghub::oneline, "%s is nullptr", *ptr);
+		*ptr = NULL;
+	}
 }
 
 static inline void free_string(char* allocated)
@@ -29,7 +42,7 @@ static bool loading_config_buffer(Json::Value* root, const char* config_path)
 	FILE* fp = fopen(config_path, "r");
 	if (nullptr == fp)
 	{
-		perror("fopen");
+		zlog_error(zloghub::oneline, "%s", strerror(errno));
 		return false;
 	}
 
@@ -37,15 +50,18 @@ static bool loading_config_buffer(Json::Value* root, const char* config_path)
 	size_t len = fread(buffer, 1, sizeof(buffer), fp);
 	if (0 == len)
 	{
-		perror("fread");
+		zlog_error(zloghub::oneline, "%s", strerror(errno));
+
 		fclose(fp);
 		return false;
 	}
 
+	zlog_info(zloghub::cr, "load config file: %s\n%s", config_path, buffer);
+
 	std::string err;
 	if (!reader->parse(buffer, buffer + len, root, &err))
 	{
-		printf("json config parse failed: %s\n", err.c_str());
+		zlog_error(zloghub::oneline, "%s", err.c_str());
 
 		fclose(fp);
 		return false;
@@ -79,6 +95,8 @@ static bool loading_config(Json::Value& root, dbargs* that)
 	if (!is_network || !is_unixsock)
 		return false;
 
+	zlog_info(zloghub::oneline, "config file check pass");
+
 	if (is_network)
 	{
 		allocate_string(&that->_host, root["dbm_host"].asString().c_str());
@@ -104,7 +122,8 @@ dbargs::dbargs(const char* config_path) :
 	_password(NULL),
 	_db(NULL),
 	_port(0),
-	_sock(NULL)
+	_sock(NULL),
+	_is_right(false)
 {
 	Json::Value root;
 	if (!loading_config_buffer(&root, config_path))
@@ -112,6 +131,8 @@ dbargs::dbargs(const char* config_path) :
 
 	if (!loading_config(root, this))
 		return;
+
+	_is_right = true;
 }
 
 dbargs::dbargs(const char* host, 
@@ -120,15 +141,19 @@ dbargs::dbargs(const char* host,
 			   const char* db,
 			   unsigned int port, 
 			   const char* sock, 
-			   const int max_connection)
+			   const unsigned int max_connection) : _is_right(false)
 {
-	host ? allocate_string(&_host, host) : [this](){ _host = NULL; }();
-	user ? allocate_string(&_user, user) : [this](){ _user = NULL; }();
-	password ? allocate_string(&_password, password) : [this](){ _password = NULL; }();
-	db ? allocate_string(&_db, db) : [this](){ _db = NULL; }();
-	_port = port;
-	sock ? allocate_string(&_sock, sock) : [this](){ _sock = NULL; }();
+	string_check_patch(&_host, host);
+	string_check_patch(&_user, user);
+	string_check_patch(&_sock, sock);
+	string_check_patch(&_password, password);
+	string_check_patch(&_db, db);
+
 	_max_connection = max_connection;
+	_port = port;
+
+	if (host || sock)
+		_is_right = true;
 }
 
 dbargs::~dbargs()

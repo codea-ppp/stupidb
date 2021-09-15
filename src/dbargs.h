@@ -14,7 +14,7 @@ public:
 		   const char* db,
 		   unsigned int port,
 		   const char* sock, 
-		   const int max_connection);
+		   const unsigned int max_connection);
 
 	~dbargs();
 
@@ -26,6 +26,8 @@ public:
 	unsigned int _port;
 	char* _sock;
 	unsigned int _max_connection;
+
+	bool _is_right;
 };
 
 }

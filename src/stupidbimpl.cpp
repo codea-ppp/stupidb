@@ -5,13 +5,19 @@
 
 #include <mysql/mysql.h>
 
+#include "src/zloghub.h"
+
 namespace stupid
 {
 
 stupidb_impl::stupidb_impl(const char* config_path) : 
 	_is_open(false), _args(config_path), _db(open())
 {
-	if (_db != nullptr) _is_open = true;
+	if (_db != nullptr) 
+	{
+		_is_open = true;
+		zlog_info(zloghub::oneline, "database %s opened", _args._db);
+	}
 }
 
 stupidb_impl::~stupidb_impl()
@@ -20,53 +26,68 @@ stupidb_impl::~stupidb_impl()
 	{
 		mysql_close(_db);
 		_is_open = false;
+
+		zlog_info(zloghub::oneline, "database %s closed", _args._db);
 	}
 }
 
-std::map<std::string, std::vector<std::string>> stupidb_impl::query(const std::string& statment)
+int stupidb_impl::query(const std::string& statment, column_ret_pt accu) const
 {
-	std::map<std::string, std::vector<std::string>> accu;
+	MYSQL_RES* ret = query(statment);
+	if (!ret)
+		return -1;
+
+	fill(ret, accu);
+
+	zlog_info(zloghub::oneline, "sql query success: %s", statment.c_str());
+
+	mysql_free_result(ret);
+	return 0;
+}
+
+int stupidb_impl::query(const std::string& statment, row_ret_pt accu) const
+{
+	MYSQL_RES* ret = query(statment);
+	if (!ret)
+		return -1;
+
+	fill(ret, accu);
+
+	zlog_info(zloghub::oneline, "sql query success: %s", statment.c_str());
+
+	mysql_free_result(ret);
+	return 0;
+}
+
+MYSQL_RES* stupidb_impl::query(const std::string& statment) const 
+{
 	if (!is_open())
-		return accu;
+		return nullptr;
 
 	if (mysql_real_query(_db, statment.c_str(), statment.length()))
 	{
-		printf("%s\n", mysql_error(_db));
-		return accu;
+		zlog_error(zloghub::oneline, "sql query failed: %s", mysql_error(_db));
+		return nullptr;
 	}
 
 	MYSQL_RES* ret = mysql_store_result(_db);
 	if (!ret)
 	{
-		printf("%s\n", mysql_error(_db));
-		return accu;
+		zlog_error(zloghub::oneline, "sql query failed: %s", mysql_error(_db));
+		return nullptr;
 	}
 
-	unsigned int num_fields = mysql_num_fields(ret);
-	unsigned int i;
-
-	MYSQL_ROW row;
-	while ((row = mysql_fetch_row(ret)))
-	{
-		unsigned long* lengths = mysql_fetch_lengths(ret);
-
-		for(i = 0; i < num_fields; i++)
-		{
-			printf("[%.*s] ", (int) lengths[i], row[i] ? row[i] : "NULL");
-		}
-
-		printf("\n");
-	}
-
-	mysql_free_result(ret);
-	return accu;
+	return ret;
 }
 
 MYSQL* stupidb_impl::open() const
 {
 	MYSQL* temp = mysql_init(nullptr);
 	if (nullptr == temp)
+	{
+		zlog_error(zloghub::oneline, "failed to init mysql handle");
 		return nullptr;
+	}
 
 	if (nullptr == mysql_real_connect(
 			temp, 
@@ -78,10 +99,44 @@ MYSQL* stupidb_impl::open() const
 			_args._sock, 
 			0)
 	) {
+		zlog_error(zloghub::oneline, "failed to connect to database: %s", mysql_error(temp));
 		return nullptr;
 	}
 
 	return temp;
+}
+
+void stupidb_impl::fill(MYSQL_RES* result, column_ret_pt accu) const 
+{
+	unsigned int num_fields = mysql_num_fields(result);
+
+	std::map<std::string, std::string> temp;
+
+	MYSQL_ROW row;
+	while ((row = mysql_fetch_row(result)))
+	{
+		temp.clear();
+		for(unsigned int i = 0; i < num_fields; i++)
+		{
+			temp[mysql_fetch_field_direct(result, i)->name] = row[i];
+		}
+
+		accu->push_back(temp);
+	}
+}
+
+void stupidb_impl::fill(MYSQL_RES* result, row_ret_pt accu) const 
+{
+	unsigned int num_fields = mysql_num_fields(result);
+
+	MYSQL_ROW row;
+	while ((row = mysql_fetch_row(result)))
+	{
+		for(unsigned int i = 0; i < num_fields; i++)
+		{
+			(*accu)[mysql_fetch_field_direct(result, i)->name].push_back(row[i]);
+		}
+	}
 }
 
 }

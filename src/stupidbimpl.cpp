@@ -14,7 +14,6 @@ namespace stupid
 stupidb_impl::stupidb_impl(const dbargs& args) : 
 	 _is_open(false), _args(args), _db(open())
 {
-	_db = open();
 	if (_db != nullptr)
 	{
 		_is_open = true;

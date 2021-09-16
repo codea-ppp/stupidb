@@ -33,7 +33,11 @@ static inline void string_check_patch(char** ptr, const char* src)
 
 static inline void free_string(char* allocated)
 {
-	if (allocated) free(allocated);
+	if (allocated)
+	{
+		free(allocated);
+		allocated = NULL;
+	}
 }
 
 static bool loading_config_buffer(Json::Value* root, const char* config_path)
@@ -163,6 +167,8 @@ dbargs::~dbargs()
 	free_string(_password);
 	free_string(_db);
 	free_string(_sock);
+
+	_is_right = false;
 }
 
 }

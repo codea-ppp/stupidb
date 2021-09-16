@@ -17,7 +17,7 @@ namespace stupid
 class stupidb_impl
 {
 public:
-	stupidb_impl(const char* config_path);
+	stupidb_impl(const dbargs& args);
 	~stupidb_impl();
 
 	bool is_open() const { return _is_open; }
@@ -34,9 +34,7 @@ private:
 
 private:
 	bool _is_open;
-
 	const dbargs _args;
- 
 	MYSQL* _db;
 };
 

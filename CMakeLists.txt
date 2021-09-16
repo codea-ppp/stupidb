@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.5.1)
 
 project(stupid)
 set(CMAKE_CXX_STANDARD 17)
-set(COMMON_LIB mariadb jsoncpp zlog)
+set(COMMON_LIB mariadb jsoncpp zlog pthread)
 
 add_library(${PROJECT_NAME} SHARED
 	src/stupidb.cpp
@@ -20,13 +20,13 @@ add_definitions(-Wall -Wextra -g3 -O0)
 target_link_libraries(${PROJECT_NAME} PRIVATE ${COMMON_LIB}
 	)
 
-add_executable(${PROJECT_NAME}_test 
-	test/connect.cpp
+add_executable(${PROJECT_NAME}_test1
+	test/test1.cpp
 	)
 
-target_include_directories(${PROJECT_NAME}_test PRIVATE 
+target_include_directories(${PROJECT_NAME}_test1 PRIVATE 
 	${PROJECT_SOURCE_DIR}
 	)
 
-target_link_libraries(${PROJECT_NAME}_test PRIVATE ${COMMON_LIB} ${PROJECT_NAME}
+target_link_libraries(${PROJECT_NAME}_test1 PRIVATE ${COMMON_LIB} ${PROJECT_NAME}
 	)

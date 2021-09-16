@@ -1,5 +1,6 @@
 #include "src/stupidbimpl.h"
 
+#include <utility>
 #include <vector>
 #include <map>
 
@@ -10,10 +11,11 @@
 namespace stupid
 {
 
-stupidb_impl::stupidb_impl(const char* config_path) : 
-	_is_open(false), _args(config_path), _db(open())
+stupidb_impl::stupidb_impl(const dbargs& args) : 
+	 _is_open(false), _args(args), _db(open())
 {
-	if (_db != nullptr) 
+	_db = open();
+	if (_db != nullptr)
 	{
 		_is_open = true;
 		zlog_info(zloghub::oneline, "database %s opened", _args._db);

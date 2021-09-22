@@ -46,10 +46,10 @@ int main(int argc, char* argv[])
 	t2.detach();
 	t3.detach();
 
-	while (true)
-		sleep(10);
+	sleep(20);
 
 	is_run = false;
+
 	LOG_FINI();
 
 	return 0;

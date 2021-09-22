@@ -25,10 +25,7 @@ static void string_check_patch(char** ptr, const char* src)
 	if (src)
 		allocate_string(ptr, src);
 	else
-	{
-		LOG_WARN(LOG_CATEGORY_ONE, "%s is nullptr", *ptr);
 		*ptr = NULL;
-	}
 }
 
 static void free_string(char* allocated)
@@ -145,7 +142,7 @@ dbargs::dbargs(const char* host,
 			   const char* db,
 			   unsigned int port, 
 			   const char* sock, 
-			   const unsigned int max_connection) : _is_right(false)
+			   const unsigned int max_connection) : _is_right(false), rc(1)
 {
 	string_check_patch(&_host, host);
 	string_check_patch(&_user, user);
@@ -162,13 +159,47 @@ dbargs::dbargs(const char* host,
 
 dbargs::~dbargs()
 {
-	free_string(_host);
-	free_string(_user);
-	free_string(_password);
-	free_string(_db);
-	free_string(_sock);
+	if (!--rc)
+	{
+		free_string(_host);
+		free_string(_user);
+		free_string(_password);
+		free_string(_db);
+		free_string(_sock);
 
-	_is_right = false;
+		_is_right = false;
+	}
+}
+
+dbargs::dbargs(const dbargs& that) 
+{ 
+	rc = ++that.rc;
+
+	_host = that._host;
+	_user = that._user;
+	_password = that._password;
+	_db = that._db;
+	_port = that._port;
+	_sock = that._sock;
+	_max_connection = that._max_connection;
+	_is_right = that._is_right;
+}
+
+const dbargs dbargs::operator=(const dbargs& that) 
+{ 
+	rc = ++that.rc;
+
+	// just copy directly, inner use
+	_host = that._host;
+	_user = that._user;
+	_password = that._password;
+	_db = that._db;
+	_port = that._port;
+	_sock = that._sock;
+	_max_connection = that._max_connection;
+	_is_right = that._is_right;
+
+	return *this;
 }
 
 }

@@ -1,6 +1,8 @@
 #ifndef _STUPIDB_SRC_DBARGS_H_
 #define _STUPIDB_SRC_DBARGS_H_
 
+#include <atomic>
+
 namespace stupid
 {
 
@@ -18,6 +20,9 @@ public:
 
 	~dbargs();
 
+	dbargs(const dbargs&);
+	const dbargs operator=(const dbargs&);
+
 public:
 	char* _host;
 	char* _user;
@@ -28,6 +33,9 @@ public:
 	unsigned int _max_connection;
 
 	bool _is_right;
+
+private:
+	mutable std::atomic_int rc;
 };
 
 }

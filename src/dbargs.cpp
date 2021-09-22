@@ -12,7 +12,7 @@
 namespace stupid
 {
 
-static inline void allocate_string(char** notalloc, const char* src)
+static void allocate_string(char** notalloc, const char* src)
 {
 	size_t len = strlen(src);
 	*notalloc = (char*)malloc(len * sizeof(char) + 1);
@@ -20,7 +20,7 @@ static inline void allocate_string(char** notalloc, const char* src)
 	(*notalloc)[len] = '\0';
 }
 
-static inline void string_check_patch(char** ptr, const char* src)
+static void string_check_patch(char** ptr, const char* src)
 {
 	if (src)
 		allocate_string(ptr, src);
@@ -31,7 +31,7 @@ static inline void string_check_patch(char** ptr, const char* src)
 	}
 }
 
-static inline void free_string(char* allocated)
+static void free_string(char* allocated)
 {
 	if (allocated)
 	{
@@ -96,7 +96,7 @@ static bool loading_config(Json::Value& root, dbargs* that)
 	if (!root.isMember("dbm_sock") || !root["dbm_sock"].isString())
 		is_unixsock = false;
 
-	if (!is_network || !is_unixsock)
+	if (is_network && is_unixsock)
 		return false;
 
 	zlog_info(zloghub::oneline, "config file check pass");

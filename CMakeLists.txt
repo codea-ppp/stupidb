@@ -11,6 +11,10 @@ add_library(${PROJECT_NAME} SHARED
 	src/dbargs.cpp
 	)
 
+target_compile_definitions(${PROJECT_NAME} PRIVATE
+	ZLOG_ENABLE
+	)
+
 target_include_directories(${PROJECT_NAME} PRIVATE
 	${PROJECT_SOURCE_DIR}
 	)

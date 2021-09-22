@@ -90,6 +90,9 @@ MYSQL* stupidb_impl::open() const
 		return nullptr;
 	}
 
+	if (!_args._is_right)
+		return nullptr;
+
 	if (nullptr == mysql_real_connect(
 			temp, 
 			_args._host, 

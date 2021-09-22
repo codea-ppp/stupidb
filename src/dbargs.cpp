@@ -96,7 +96,7 @@ static bool loading_config(Json::Value& root, dbargs* that)
 	if (!root.isMember("dbm_sock") || !root["dbm_sock"].isString())
 		is_unixsock = false;
 
-	if (is_network && is_unixsock)
+	if (!is_network && !is_unixsock)
 		return false;
 
 	zlog_info(zloghub::oneline, "config file check pass");

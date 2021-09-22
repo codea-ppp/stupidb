@@ -1,45 +1,43 @@
-#include <mutex>
 #include <unistd.h>
 
+#include <stdexcept>
 #include <thread>
 #include <chrono>
+#include <mutex>
 
-#include "src/dbargs.h"
-#include "src/stupidbimpl.h"
 #include "src/stupidb.h"
-#include "src/zloghub.h"
-#include "src/stupidbalias.h"
 
 bool static is_run = true;
-static std::mutex fuck;
 
 void rolling()
 {
-	auto impl = stupid::stupidb::get_instance("../dbconfig.json"); 
-		
-	while (is_run)
+	try
 	{
-		std::scoped_lock<std::mutex> guard(fuck);
+		auto impl = stupid::stupidb::get_instance("../dbconfig.json"); 
 
-		stupid::row_ret_t rret;
-		if (impl->query(std::string("select * from tmall_product;"), &rret))
-			return;
+		while (is_run)
+		{
+			stupid::row_ret_t rret;
+			if (impl->query(std::string("select * from tmall_product;"), &rret))
+				return;
 
-		usleep(1000);
+			usleep(1000);
 
-		zlog_info(stupid::zloghub::oneline, "query success");
-
-		stupid::column_ret_t cret;
-		if (impl->query(std::string("select * from tmall_product;"), &cret))
-			return;
-
-		zlog_info(stupid::zloghub::oneline, "query success");
+			stupid::column_ret_t cret;
+			if (impl->query(std::string("select * from tmall_product;"), &cret))
+				return;
+		}
+	}
+	catch (std::runtime_error err)
+	{
+		LOG_FATAL(LOG_CATEGORY_ONE, "%s", err.what());
+		return;
 	}
 }
 
 int main(int argc, char* argv[])
 {
-	stupid::zloghub::init("../zlog.conf");
+	LOG_INIT("../zlog.conf");
 
 	std::thread t1(rolling);
 	std::thread t2(rolling);
@@ -51,7 +49,8 @@ int main(int argc, char* argv[])
 	while (true)
 		sleep(10);
 
-	stupid::zloghub::fini();
 	is_run = false;
+	LOG_FINI();
+
 	return 0;
 }

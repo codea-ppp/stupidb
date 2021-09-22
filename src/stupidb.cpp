@@ -1,7 +1,14 @@
 #include "src/stupidb.h"
+
+#include <exception>
+#include <stdexcept>
 #include <memory>
 #include <mutex>
 #include <new>
+
+#include "src/stupidbimpl.h"
+#include "src/dbargs.h"
+#include "src/zloghub.h"
 
 namespace stupid
 {
@@ -30,6 +37,12 @@ int stupidb::query(const std::string& statment, row_ret_pt accu) const
 
 stupidb::stupidb(const dbargs args)
 {
+	if (!args._is_right)
+	{
+		impls = nullptr;
+		throw std::runtime_error("bad config file");
+	}
+
 	impls = (stupidb_impl*)malloc(sizeof(stupidb_impl) * args._max_connection);
 	for (size_t i = 0; i < args._max_connection; ++i)
 	{

@@ -26,7 +26,7 @@ static void string_check_patch(char** ptr, const char* src)
 		allocate_string(ptr, src);
 	else
 	{
-		zlog_warn(zloghub::oneline, "%s is nullptr", *ptr);
+		LOG_WARN(LOG_CATEGORY_ONE, "%s is nullptr", *ptr);
 		*ptr = NULL;
 	}
 }
@@ -46,7 +46,7 @@ static bool loading_config_buffer(Json::Value* root, const char* config_path)
 	FILE* fp = fopen(config_path, "r");
 	if (nullptr == fp)
 	{
-		zlog_error(zloghub::oneline, "%s", strerror(errno));
+		LOG_ERROR(LOG_CATEGORY_ONE, "%s", strerror(errno));
 		return false;
 	}
 
@@ -54,18 +54,18 @@ static bool loading_config_buffer(Json::Value* root, const char* config_path)
 	size_t len = fread(buffer, 1, sizeof(buffer), fp);
 	if (0 == len)
 	{
-		zlog_error(zloghub::oneline, "%s", strerror(errno));
+		LOG_ERROR(LOG_CATEGORY_ONE, "%s", strerror(errno));
 
 		fclose(fp);
 		return false;
 	}
 
-	zlog_info(zloghub::cr, "load config file: %s\n%s", config_path, buffer);
+	LOG_INFO(LOG_CATEGORY_CR, "load config file: %s\n%s", config_path, buffer);
 
 	std::string err;
 	if (!reader->parse(buffer, buffer + len, root, &err))
 	{
-		zlog_error(zloghub::oneline, "%s", err.c_str());
+		LOG_ERROR(LOG_CATEGORY_ONE, "%s", err.c_str());
 
 		fclose(fp);
 		return false;
@@ -99,7 +99,7 @@ static bool loading_config(Json::Value& root, dbargs* that)
 	if (!is_network && !is_unixsock)
 		return false;
 
-	zlog_info(zloghub::oneline, "config file check pass");
+	LOG_INFO(LOG_CATEGORY_ONE, "config file check pass");
 
 	if (is_network)
 	{

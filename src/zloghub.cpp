@@ -3,6 +3,8 @@
 namespace stupid
 {
 
+#ifdef ZLOG_ENABLE
+
 bool zloghub::init(const char* config_path)
 { 
 	if (zlog_init(config_path))
@@ -18,5 +20,7 @@ void zloghub::fini()
 { 
 	zlog_fini(); 
 }
+
+#endif // ZLOG_ENABLE
 
 }

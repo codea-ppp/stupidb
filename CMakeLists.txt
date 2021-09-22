@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.5.1)
 
 project(stupid)
 set(CMAKE_CXX_STANDARD 17)
-set(COMMON_LIB mariadb jsoncpp zlog pthread)
+set(COMMON_LIB mariadb jsoncpp pthread)
 
 add_library(${PROJECT_NAME} SHARED
 	src/stupidb.cpp
@@ -11,15 +11,27 @@ add_library(${PROJECT_NAME} SHARED
 	src/dbargs.cpp
 	)
 
-target_compile_definitions(${PROJECT_NAME} PRIVATE
-	ZLOG_ENABLE
+option(zlog_enable "enable zlog log out" ON)
+option(debug "compile as debug mode)" ON)
+
+if(zlog_enable)
+	target_compile_definitions(${PROJECT_NAME} PUBLIC 
+		ZLOG_ENABLE
 	)
+
+	set(COMMON_LIB ${COMMON_LIB} zlog)
+
+endif()
+
+if(debug)
+	add_definitions(-Wall -Wextra -g3 -O0)
+else()
+	add_definitions(-Wall -Wextra -O3)
+endif()
 
 target_include_directories(${PROJECT_NAME} PRIVATE
 	${PROJECT_SOURCE_DIR}
 	)
-
-add_definitions(-Wall -Wextra -g3 -O0)
 
 target_link_libraries(${PROJECT_NAME} PRIVATE ${COMMON_LIB}
 	)

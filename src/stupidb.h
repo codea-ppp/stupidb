@@ -6,12 +6,13 @@
 #include <vector>
 
 #include "src/stupidbalias.h"
-#include "src/stupidbimpl.h"
-#include "src/dbargs.h"
 #include "src/zloghub.h"
 
 namespace stupid
 {
+
+class stupidb_impl;
+class dbargs;
 
 class stupidb 
 {

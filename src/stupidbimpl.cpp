@@ -17,7 +17,8 @@ stupidb_impl::stupidb_impl(const dbargs& args) :
 	if (_db != nullptr)
 	{
 		_is_open = true;
-		zlog_info(zloghub::oneline, "database %s opened", _args._db);
+
+		LOG_INFO(LOG_CATEGORY_ONE, "database %s opened", _args._db);
 	}
 }
 
@@ -28,7 +29,7 @@ stupidb_impl::~stupidb_impl()
 		mysql_close(_db);
 		_is_open = false;
 
-		zlog_info(zloghub::oneline, "database %s closed", _args._db);
+		LOG_INFO(LOG_CATEGORY_ONE, "database %s closed", _args._db);
 	}
 }
 
@@ -40,7 +41,7 @@ int stupidb_impl::query(const std::string& statment, column_ret_pt accu) const
 
 	fill(ret, accu);
 
-	zlog_info(zloghub::oneline, "sql query success: %s", statment.c_str());
+	LOG_INFO(LOG_CATEGORY_ONE, "sql query success: %s", statment.c_str());
 
 	mysql_free_result(ret);
 	return 0;
@@ -54,7 +55,7 @@ int stupidb_impl::query(const std::string& statment, row_ret_pt accu) const
 
 	fill(ret, accu);
 
-	zlog_info(zloghub::oneline, "sql query success: %s", statment.c_str());
+	LOG_INFO(LOG_CATEGORY_ONE, "sql query success: %s", statment.c_str());
 
 	mysql_free_result(ret);
 	return 0;
@@ -67,14 +68,14 @@ MYSQL_RES* stupidb_impl::query(const std::string& statment) const
 
 	if (mysql_real_query(_db, statment.c_str(), statment.length()))
 	{
-		zlog_error(zloghub::oneline, "sql query failed: %s", mysql_error(_db));
+		LOG_ERROR(LOG_CATEGORY_ONE, "sql query failed: %s", mysql_error(_db));
 		return nullptr;
 	}
 
 	MYSQL_RES* ret = mysql_store_result(_db);
 	if (!ret)
 	{
-		zlog_error(zloghub::oneline, "sql query failed: %s", mysql_error(_db));
+		LOG_ERROR(LOG_CATEGORY_ONE, "sql query failed: %s", mysql_error(_db));
 		return nullptr;
 	}
 
@@ -86,7 +87,7 @@ MYSQL* stupidb_impl::open() const
 	MYSQL* temp = mysql_init(nullptr);
 	if (nullptr == temp)
 	{
-		zlog_error(zloghub::oneline, "failed to init mysql handle");
+		LOG_ERROR(LOG_CATEGORY_ONE, "failed to init mysql handle");
 		return nullptr;
 	}
 
@@ -103,7 +104,7 @@ MYSQL* stupidb_impl::open() const
 			_args._sock, 
 			0)
 	) {
-		zlog_error(zloghub::oneline, "failed to connect to database: %s", mysql_error(temp));
+		LOG_ERROR(LOG_CATEGORY_ONE, "failed to connect to database: %s", mysql_error(temp));
 		return nullptr;
 	}
 

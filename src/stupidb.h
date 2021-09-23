@@ -39,7 +39,7 @@ private:
 private:
 	stupidb_impl* impls;
 	size_t impl_length;
-	mutable std::atomic_int32_t impl_index;
+	mutable std::atomic_uint32_t impl_index;
 
 	inline static std::map<std::string, std::shared_ptr<stupidb>> registe;
 };

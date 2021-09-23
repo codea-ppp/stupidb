@@ -3,6 +3,7 @@
 #include <exception>
 #include <stdexcept>
 #include <memory>
+#include <atomic>
 #include <mutex>
 #include <new>
 
@@ -61,12 +62,14 @@ std::shared_ptr<stupidb> stupidb::get_instance(const char* host,
 
 int stupidb::query(const std::string& statment, column_ret_pt accu) const
 {
-	return impls[++impl_index % impl_length].query(statment, accu);
+	unsigned int index = impl_index.fetch_add(1, std::memory_order_release);
+	return impls[index % impl_length].query(statment, accu);
 }
 
 int stupidb::query(const std::string& statment, row_ret_pt accu) const
 {
-	return impls[++impl_index % impl_length].query(statment, accu);
+	unsigned int index = impl_index.fetch_add(1, std::memory_order_release);
+	return impls[index % impl_length].query(statment, accu);
 }
 
 stupidb::stupidb(const dbargs args)

@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 3.5.1)
 
 project(stupid)
 set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_COMPILER clang++)
+set(CMAKE_C_COMPILER clang)
 set(COMMON_LIB mariadb jsoncpp pthread)
 
 add_library(${PROJECT_NAME} SHARED

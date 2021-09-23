@@ -46,7 +46,8 @@ int main(int argc, char* argv[])
 	t2.detach();
 	t3.detach();
 
-	sleep(20);
+	while (true)
+		sleep(20);
 
 	is_run = false;
 

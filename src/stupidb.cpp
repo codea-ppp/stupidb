@@ -24,10 +24,7 @@ std::shared_ptr<stupidb> stupidb::get_instance(const char* config_path)
 	if (!args._is_right)
 		throw std::runtime_error("bad config file");
 
-	std::string key(args._user);
-	key.append(args._password);
-	key.append(args._db);
-
+	const std::string key(args.key());
 	if (registe.count(key))
 		return registe[key];
 
@@ -50,10 +47,7 @@ std::shared_ptr<stupidb> stupidb::get_instance(const char* host,
 	if (!args._is_right)
 		throw std::runtime_error("bad config file");
 
-	std::string key(args._user);
-	key.append(args._password);
-	key.append(args._db);
-
+	const std::string key(args.key());
 	if (registe.count(key))
 		return registe[key];
 

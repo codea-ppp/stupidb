@@ -202,4 +202,11 @@ const dbargs dbargs::operator=(const dbargs& that)
 	return *this;
 }
 
+const std::string dbargs::key() const 
+{
+	std::string accu;
+	accu.append(_user).append(_db);
+	return accu;
+}
+
 }

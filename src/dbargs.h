@@ -2,6 +2,7 @@
 #define _STUPIDB_SRC_DBARGS_H_
 
 #include <atomic>
+#include <string>
 
 namespace stupid
 {
@@ -22,6 +23,8 @@ public:
 
 	dbargs(const dbargs&);
 	const dbargs operator=(const dbargs&);
+
+	const std::string key() const;
 
 public:
 	char* _host;

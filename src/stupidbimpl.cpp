@@ -41,7 +41,7 @@ int stupidb_impl::query(const std::string& statment, column_ret_pt accu) const
 
 	fill(ret, accu);
 
-	LOG_INFO(LOG_CATEGORY_ONE, "sql query success: %s", statment.c_str());
+//	LOG_INFO(LOG_CATEGORY_ONE, "sql query success: %s", statment.c_str());
 
 	mysql_free_result(ret);
 	return 0;
@@ -55,7 +55,7 @@ int stupidb_impl::query(const std::string& statment, row_ret_pt accu) const
 
 	fill(ret, accu);
 
-	LOG_INFO(LOG_CATEGORY_ONE, "sql query success: %s", statment.c_str());
+//	LOG_INFO(LOG_CATEGORY_ONE, "sql query success: %s", statment.c_str());
 
 	mysql_free_result(ret);
 	return 0;
@@ -68,14 +68,14 @@ MYSQL_RES* stupidb_impl::query(const std::string& statment) const
 
 	if (mysql_real_query(_db, statment.c_str(), statment.length()))
 	{
-		LOG_ERROR(LOG_CATEGORY_ONE, "sql query failed: %s", mysql_error(_db));
+		LOG_ERROR(LOG_CATEGORY_ONE, "sql query %s failed: %s", statment.c_str(), mysql_error(_db));
 		return nullptr;
 	}
 
 	MYSQL_RES* ret = mysql_store_result(_db);
 	if (!ret)
 	{
-		LOG_ERROR(LOG_CATEGORY_ONE, "sql query failed: %s", mysql_error(_db));
+		LOG_ERROR(LOG_CATEGORY_ONE, "sql query %s failed: %s", statment.c_str(), mysql_error(_db));
 		return nullptr;
 	}
 

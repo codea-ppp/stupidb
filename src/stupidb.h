@@ -38,6 +38,7 @@ private:
 
 private:
 	stupidb_impl* impls;
+	std::atomic_int8_t* busy;
 	size_t impl_length;
 	mutable std::atomic_uint32_t impl_index;
 

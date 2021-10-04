@@ -21,7 +21,7 @@ void rolling()
 			if (impl->query(std::string("select * from tmall_product;"), &rret))
 				return;
 
-			usleep(1000);
+			usleep(100);
 
 			stupid::column_ret_t cret;
 			if (impl->query(std::string("select * from tmall_product;"), &cret))
@@ -42,9 +42,13 @@ int main(int argc, char* argv[])
 	std::thread t1(rolling);
 	std::thread t2(rolling);
 	std::thread t3(rolling);
+	std::thread t4(rolling);
+	std::thread t5(rolling);
 	t1.detach();
 	t2.detach();
 	t3.detach();
+	t4.detach();
+	t5.detach();
 
 	while (true)
 		sleep(20);

@@ -6,6 +6,7 @@
 #include <atomic>
 #include <mutex>
 #include <new>
+#include <string.h>
 
 #include "src/stupidbimpl.h"
 #include "src/dbargs.h"
@@ -60,16 +61,36 @@ std::shared_ptr<stupidb> stupidb::get_instance(const char* host,
 	return registe[key];
 }
 
+static thread_local int8_t except = 0; // always 0 in actual
+
 int stupidb::query(const std::string& statment, column_ret_pt accu) const
 {
-	unsigned int index = impl_index.fetch_add(1, std::memory_order_release);
-	return impls[index % impl_length].query(statment, accu);
+	unsigned int index = impl_index.fetch_add(1, std::memory_order_release) % impl_length;
+	while (!busy[index].compare_exchange_weak(except, 1, std::memory_order_release, std::memory_order_relaxed));
+
+	LOG_INFO(LOG_CATEGORY_ONE, "%d in use", index);
+
+	int ret = impls[index].query(statment, accu);
+	busy[index].store(0, std::memory_order_relaxed);
+
+	LOG_INFO(LOG_CATEGORY_ONE, "%d out of use", index);
+
+	return ret;
 }
 
 int stupidb::query(const std::string& statment, row_ret_pt accu) const
 {
-	unsigned int index = impl_index.fetch_add(1, std::memory_order_release);
-	return impls[index % impl_length].query(statment, accu);
+	unsigned int index = impl_index.fetch_add(1, std::memory_order_release) % impl_length;
+	while (!busy[index].compare_exchange_weak(except, 1, std::memory_order_release, std::memory_order_relaxed));
+
+	LOG_INFO(LOG_CATEGORY_ONE, "%d in use", index);
+
+	int ret = impls[index].query(statment, accu);
+	busy[index].store(0, std::memory_order_relaxed);
+
+	LOG_INFO(LOG_CATEGORY_ONE, "%d out of use", index);
+
+	return ret;
 }
 
 stupidb::stupidb(const dbargs args)
@@ -78,6 +99,12 @@ stupidb::stupidb(const dbargs args)
 	for (size_t i = 0; i < args._max_connection; ++i)
 	{
 		new(impls + i) stupidb_impl(args);
+	}
+
+	busy = new std::atomic_int8_t[args._max_connection];
+	for (size_t i = 0; i < args._max_connection; ++i)
+	{
+		busy[i].store(0);
 	}
 
 	impl_length = args._max_connection;

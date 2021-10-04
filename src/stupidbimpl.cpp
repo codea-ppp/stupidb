@@ -41,7 +41,7 @@ int stupidb_impl::query(const std::string& statment, column_ret_pt accu) const
 
 	fill(ret, accu);
 
-//	LOG_INFO(LOG_CATEGORY_ONE, "sql query success: %s", statment.c_str());
+	LOG_INFO(LOG_CATEGORY_ONE, "sql query success: %s", statment.c_str());
 
 	mysql_free_result(ret);
 	return 0;
@@ -55,7 +55,7 @@ int stupidb_impl::query(const std::string& statment, row_ret_pt accu) const
 
 	fill(ret, accu);
 
-//	LOG_INFO(LOG_CATEGORY_ONE, "sql query success: %s", statment.c_str());
+	LOG_INFO(LOG_CATEGORY_ONE, "sql query success: %s", statment.c_str());
 
 	mysql_free_result(ret);
 	return 0;

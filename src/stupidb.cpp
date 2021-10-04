@@ -60,14 +60,12 @@ static thread_local int8_t except = 0; // always 0 in actual
 int stupidb::query(const std::string& statment, column_ret_pt accu) const
 {
 	unsigned int index = impl_index.fetch_add(1, std::memory_order_release) % impl_length;
+
+	do { except = 0; } 
 	while (!busy[index].compare_exchange_weak(except, 1, std::memory_order_release, std::memory_order_relaxed));
 
-	LOG_INFO(LOG_CATEGORY_ONE, "%d in use", index);
-
 	int ret = impls[index].query(statment, accu);
-	busy[index].store(0, std::memory_order_relaxed);
-
-	LOG_INFO(LOG_CATEGORY_ONE, "%d out of use", index);
+	busy[index].store(0, std::memory_order_acquire);
 
 	return ret;
 }
@@ -75,14 +73,12 @@ int stupidb::query(const std::string& statment, column_ret_pt accu) const
 int stupidb::query(const std::string& statment, row_ret_pt accu) const
 {
 	unsigned int index = impl_index.fetch_add(1, std::memory_order_release) % impl_length;
+
+	do { except = 0; } 
 	while (!busy[index].compare_exchange_weak(except, 1, std::memory_order_release, std::memory_order_relaxed));
 
-	LOG_INFO(LOG_CATEGORY_ONE, "%d in use", index);
-
 	int ret = impls[index].query(statment, accu);
-	busy[index].store(0, std::memory_order_relaxed);
-
-	LOG_INFO(LOG_CATEGORY_ONE, "%d out of use", index);
+	busy[index].store(0, std::memory_order_acquire);
 
 	return ret;
 }

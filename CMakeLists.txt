@@ -26,9 +26,9 @@ if(zlog_enable)
 endif()
 
 if(debug)
-	add_definitions(-Wall -Wextra -g3 -O0)
+	add_definitions(-Wall -Wextra -Wstrict-prototypes -g3 -O0)
 else()
-	add_definitions(-Wall -Wextra -O3)
+	add_definitions(-Wall -Wextra -Wstrict-prototypes -O3)
 endif()
 
 target_include_directories(${PROJECT_NAME} PRIVATE

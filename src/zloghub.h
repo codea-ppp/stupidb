@@ -22,7 +22,6 @@ public:
 	inline static zlog_category_t* oneline;
 	inline static zlog_category_t* cr;
 
-private:
 	const zloghub& operator=(const zloghub&) = delete;
 	zloghub(const zloghub&) = delete;
 	zloghub() = delete;

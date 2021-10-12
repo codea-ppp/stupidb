@@ -31,7 +31,6 @@ public:
 
 	~stupidb();
 
-private:
 	stupidb(const dbargs args);
 	stupidb(const stupidb&) = delete;
 	const stupidb& operator=(const stupidb&) = delete;

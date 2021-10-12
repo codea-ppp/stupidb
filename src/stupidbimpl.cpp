@@ -103,7 +103,7 @@ MYSQL* stupidb_impl::open() const
 			_args._port, 
 			_args._sock, 
 			0)
-	) {
+	) { 
 		LOG_ERROR(LOG_CATEGORY_ONE, "failed to connect to database: %s", mysql_error(temp));
 		return nullptr;
 	}
